@@ -1,0 +1,12 @@
+Version 0.0 currently in development start stage
+
+You've got :
+- a lot of git use PHP classes
+- links to common git commands
+- raw git checkout, status and log display on a web page
+
+We need :
+- add, remove, commit GUI
+- more gracefull display
+- git log detail / diffs
+
