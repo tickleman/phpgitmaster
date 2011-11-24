@@ -20,9 +20,11 @@ class Git_Status
 		exec(Git_Commands::GIT_STATUS, $raw_result);
 		$git_ignore = new Git_Ignore();
 		foreach ($raw_result as $raw_line) {
-			$file_change = File_Change::createFromGitStatusRawLine($raw_line);
-			if (!$git_ignore->isFileIgnored($file_change->getFileName())) {
-				$this->files_changes->add($file_change);
+			if ((substr($raw_line, 0, 1) !== "#") && (substr($raw_line, 2, 1) === " ")) {
+				$file_change = File_Change::createFromGitStatusRawLine($raw_line);
+				if (!$git_ignore->isFileIgnored($file_change->getFileName())) {
+					$this->files_changes->add($file_change);
+				}
 			}
 		}
 	}
