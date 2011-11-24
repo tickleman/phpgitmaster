@@ -1,13 +1,15 @@
-Version 0.0 currently in development start stage
+Beta Version 0.1 currently in development stage
+
+This is a first pre-version you can use, with basic "active" features.
 
 You've got :
-- a lot of git use PHP classes
-- links to common git commands
-- raw git checkout, status and log display on a web page
-- add, remove, commit GUI
+- initialisation commands : init, clone
+- supports .gitignore file
+- common git workflow commands : fetch, commit, merge (without commit), push
+- raw git checkout, status and log display on the web interface
+- an API : a lot of usefull git PHP classes to enable an easy extend of this project
 
 We need :
-- for a standalone repository : link to a remote repository (git remote add origin (url) call)
-- merge
-- more gracefull display
-- git log detail / diffs
+- git log detailled consultation (ie files contents and diffs)
+- more merge options (preferred files, conflicts solving tool)
+- more gracefull display (templating)
