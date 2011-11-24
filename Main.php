@@ -91,14 +91,14 @@ EOT;
 		$git_checkout = new Git_Checkout();
 		$git_status   = new Git_Status();
 		$git_log      = new Git_Log();
-		$html = "<h3>git checkout</h3>"
-		. "<pre>" . htmlentities($git_checkout->toString()) . "</pre>"
+		$html = "<h3>git checkout</h3>\n"
+		. "<pre>" . htmlentities($git_checkout->toString()) . "</pre>\n"
 		. "<h3>git status</h3>"
-		. "<pre>" . htmlentities($git_status->toString()) . "</pre>"
+		. "<pre>" . htmlentities($git_status->toString()) . "</pre>\n"
 		. "<h3>git log</h3>"
-		. "<pre>" . htmlentities($git_log->toString()) . "</pre>"
+		. "<pre>" . htmlentities($git_log->toString()) . "</pre>\n"
 		. "<h3>git config</h3>"
-		. "<pre>" . htmlentities(Git_Config::toString()) . "</pre>";
+		. "<pre>" . htmlentities(Git_Config::toString()) . "</pre>\n";
 		return $html;
 	}
 
@@ -116,13 +116,13 @@ EOT;
 $project_path_change_html<br>
 $author_change_html
 <p>
-<button onclick="location=''">REFRESH<br>STATUS</button> &gt;
+<button onclick="location='./'">REFRESH<br>STATUS</button> &gt;
 <button onclick="location='?command=fetch'">\/<br>FETCH</button> &gt;
 <button onclick="location='?command=merge'">&lt;=&gt;<br>MERGE</button> &gt;
 <button onclick="if (document.commit.message.value) document.commit.submit(); else { alert('You must comment your commit'); document.commit.message.focus(); } ">--&gt;<br>COMMIT</button> &gt;
 <button onclick="location='?command=push'">/\<br>PUSH</button>
 <br>
-<form name="commit" action="" method="post">
+<form name="commit" action="./" method="post">
 <input type="hidden" name="command" value="commit">
 <h3>Commit</h3>
 $files_changes_html
@@ -155,6 +155,7 @@ EOT;
 	 */
 	public static function mainCall($params)
 	{
+		echo "<html><head><title>PhpGitMaster by Tickleman</title></head><body>\n";
 		Main::start($params);
 		if ($params["command"]) {
 			echo "<h3>$params[command] result :</h3>"
@@ -169,6 +170,7 @@ EOT;
 			echo Main::guiMainActions();
 			echo Main::guiLog();
 		}
+		echo "</body></html>\n";
 	}
 
 	//----------------------------------------------------------------------------------------- start
