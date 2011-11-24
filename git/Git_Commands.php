@@ -8,7 +8,7 @@ class Git_Commands
 
 	const GIT_ADD               = "git add '@file_name'";
 	const GIT_CHECKOUT          = "git checkout";
-	const GIT_CLONE             = "git clone";
+	const GIT_CLONE             = "git clone '@url' ./";
 	const GIT_COMMIT            = "git commit --author='@author' -m '@message'";
 	const GIT_COMMIT_AMEND      = "git commit --author='@author' -m '@message' --amend";
 	const GIT_CONFIG_USER_NAME  = "git config --global user.name '@name'";
@@ -17,6 +17,7 @@ class Git_Commands
 	const GIT_INIT              = "git init";
 	const GIT_LOG               = "git log --raw --date=iso";
 	const GIT_PUSH              = "git push -u origin master";
+	const GIT_MERGE             = "git merge origin/master --no-commit";
 	const GIT_REMOVE            = "git rm '@file_name'";
 	const GIT_STATUS            = "git status -s"; 
 
@@ -33,6 +34,20 @@ class Git_Commands
 		return $raw_output;
 	}
 
+	//-------------------------------------------------------------------------------------- cloneCmd
+	/**
+	 * @param string $url
+	 * @return array
+	 */
+	public static function cloneCmd($url)
+	{
+		$command = str_replace("@url", $url, Git_Commands::GIT_CLONE);
+		$raw_output = array("> " . $command);
+		exec($command, $raw_output);
+		Git_Ignore::createNew();
+		return $raw_output;
+	}
+
 	//---------------------------------------------------------------------------------------- commit
 	/**
 	 * @param array $files
@@ -46,6 +61,7 @@ class Git_Commands
 			switch ($change_type) {
 				case File_Change::ADD:
 				case File_Change::MODIFY:
+				case File_Change::UNMERGED:
 				case File_Change::NOT:
 					$raw_output = array_merge($raw_output, Git_Commands::add($file_name));
 					break;
@@ -104,7 +120,9 @@ class Git_Commands
 	 */
 	public static function merge()
 	{
-		return array("Feature not ready yet, and this is not the easiest ;)");
+		$raw_output = array("> " . Git_Commands::GIT_MERGE);
+		exec(Git_Commands::GIT_MERGE, $raw_output);
+		return $raw_output;
 	}
 
 	//------------------------------------------------------------------------------------------ push

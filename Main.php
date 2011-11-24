@@ -5,6 +5,7 @@ include_once "git/Git_Checkout.php";
 include_once "git/Git_Commands.php";
 include_once "git/Git_Config.php";
 include_once "git/Git_Log.php";
+include_once "git/Git_Merge_Solver.php";
 include_once "git/Git_Status.php";
 include_once "gui/Gui_Changed_Files_Selector.php";
 
@@ -20,6 +21,8 @@ class Main
 	private static function callCommand($params)
 	{
 		switch ($params["command"]) {
+			case "clone":
+				return Git_Commands::cloneCmd($params["clone_url"]);
 			case "commit":
 				return Git_Commands::commit($params["files"], $params["message"], $params["amend"]);
 			case "fetch":
@@ -30,6 +33,8 @@ class Main
 				return Git_Commands::merge();
 			case "push":
 				return Git_Commands::push();
+			case "prefer":
+				return Git_Merge_Solver::prefer($params["object_id"]);
 		}
 	}
 
@@ -76,8 +81,19 @@ EOT;
 	 */
 	private static function guiInitButton()
 	{
+		$project_path_change_html = Main::guiProjectPathInput();
 		$html = <<<EOT
+$project_path_change_html
+<h3>Welcome PhpGitMaster</h3>
+What would you do ?
+<p>
 <button onclick="location='?command=init'">INIT</button>
+<p>
+OR
+<p>
+<button onclick="location='?command=clone&clone_url='+document.getElementById('clone_url').value">CLONE</button>
+<input id="clone_url" value="git@github.com:username/projectname.git" size="60">
+<script> document.getElementById("clone_url").focus(); </script>
 EOT;
 		return $html;
 	}
@@ -118,8 +134,8 @@ $author_change_html
 <p>
 <button onclick="location='./'">REFRESH<br>STATUS</button> &gt;
 <button onclick="location='?command=fetch'">\/<br>FETCH</button> &gt;
-<button onclick="location='?command=merge'">&lt;=&gt;<br>MERGE</button> &gt;
 <button onclick="if (document.commit.message.value) document.commit.submit(); else { alert('You must comment your commit'); document.commit.message.focus(); } ">--&gt;<br>COMMIT</button> &gt;
+<button onclick="location='?command=merge'">&lt;=&gt;<br>MERGE</button> &gt;
 <button onclick="location='?command=push'">/\<br>PUSH</button>
 <br>
 <form name="commit" action="./" method="post">
@@ -157,19 +173,29 @@ EOT;
 	{
 		echo "<html><head><title>PhpGitMaster by Tickleman</title></head><body>\n";
 		Main::start($params);
+
 		if ($params["command"]) {
-			echo "<h3>$params[command] result :</h3>"
-			. "<pre style='border: 1px solid black;margin:2px; padding:2px;'>"
-			. htmlentities(Main::cleanUpCallResult(join("\n", Main::callCommand($params))))
-			. "</pre>"
-			. "<p>";
+			$command_result = Main::callCommand($params);
 		}
+
 		if (!Git::isInitialized()) {
 			echo Main::guiInitButton();
 		} else {
 			echo Main::guiMainActions();
+		}
+
+		if ($params["command"]) {
+			echo "<h3>$params[command] result :</h3>"
+			. "<pre style='border: 1px solid black;margin:2px; padding:2px;'>"
+			. htmlentities(Main::cleanUpCallResult(join("\n", $command_result)))
+			. "</pre>"
+			. "<p>";
+		}
+
+		if (Git::isInitialized()) {
 			echo Main::guiLog();
 		}
+
 		echo "</body></html>\n";
 	}
 
