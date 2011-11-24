@@ -63,7 +63,7 @@ class Git_Log_Entry
 						break;
 					case "D":
 						if (substr($line, 0, 8) === "Date:   ") {
-							$this->date = DateTime::createFromFormat(Git_Formats::date, substr($line, 8));
+							$this->date = new DateTime(substr($line, 8));
 						}
 						break;
 						case "M":
