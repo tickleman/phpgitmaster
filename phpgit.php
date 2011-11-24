@@ -37,8 +37,6 @@ class Author
 			$author->name  = $raw_author;
 			$author->email = null;
 		}
-echo "name = $author->name<br>";
-echo "email = $author->email<br>";
 		return $author;
 	}
 
@@ -388,7 +386,8 @@ class Git_Commands
 	const GIT_ADD               = "git add '@file_name'";
 	const GIT_CHECKOUT          = "git checkout";
 	const GIT_CLONE             = "git clone";
-	const GIT_COMMIT            = "git commit --amend --author='@author' -m '@message'";
+	const GIT_COMMIT            = "git commit --author='@author' -m '@message'";
+	const GIT_COMMIT_AMEND      = "git commit --author='@author' -m '@message' --amend";
 	const GIT_CONFIG_USER_NAME  = "git config --global user.name '@name'";
 	const GIT_CONFIG_USER_EMAIL = "git config --global user.email '@email'";
 	const GIT_FETCH             = "git fetch";
@@ -416,7 +415,7 @@ class Git_Commands
 	 * @param string $message
 	 * @return array
 	 */
-	public static function commit($add_files, $message)
+	public static function commit($add_files, $message, $amend)
 	{
 		$raw_output = Git_Config::apply();
 		if ($add_files) foreach ($add_files as $file_name => $add) if ($add) {
@@ -426,9 +425,8 @@ class Git_Commands
 		$command = str_replace(
 			array("@author", "@message"),
 			array(Git_Config::getAuthor()->toString(), $message),
-			Git_Commands::GIT_COMMIT
+			$amend ? Git_Commands::GIT_COMMIT_AMEND : Git_Commands::GIT_COMMIT 
 		);
-echo "<pre>" . htmlentities($command) . "</pre>";
 		exec($command, $raw_output);
 		return $raw_output;
 	}
@@ -461,6 +459,26 @@ echo "<pre>" . htmlentities($command) . "</pre>";
 		}
 	}
 
+	//----------------------------------------------------------------------------------------- merge
+	/**
+	 * @return array
+	 */
+	public static function merge()
+	{
+		return array("Feature not ready yet, and this is not the easiest ;)");
+	}
+
+	//------------------------------------------------------------------------------------------ push
+	/**
+	 * @return array
+	 */
+	public static function push()
+	{
+		$raw_output = array();
+		exec(Git_Commands::GIT_PUSH, $raw_output);
+		return $raw_output;
+	}
+
 }
 
 //###################################################################################### Git_Config
@@ -472,24 +490,19 @@ class Git_Config
 	 */
 	private static $author;
 
+	/**
+	 * @var string
+	 */
+	private static $project_path;
+
 	//----------------------------------------------------------------------------------------- apply
 	/**
 	 * @result array
 	 */
 	public static function apply()
 	{
-		$raw_output = array();
-		$command = str_replace(
-			"@name", Git_Config::getAuthor()->getName(), Git_Commands::GIT_CONFIG_USER_NAME
-		);
-echo htmlentities($command) . "<br>";
-		exec($command, $raw_output);
-		$command = str_replace(
-			"@email", Git_Config::getAuthor()->getEmail(), Git_Commands::GIT_CONFIG_USER_EMAIL
-		);
-echo htmlentities($command) . "<br>";
-		exec($command, $raw_output);
-		return $raw_output;
+		chdir(Git_Config::$project_path);
+		return array();
 	}
 
 	//------------------------------------------------------------------------------------- getAuthor
@@ -501,6 +514,15 @@ echo htmlentities($command) . "<br>";
 		return Git_Config::$author;
 	}
 
+	//-------------------------------------------------------------------------------- getProjectPath
+	/**
+	 * @result string
+	 */
+	public static function getProjectPath()
+	{
+		return Git_Config::$project_path;
+	}
+
 	//------------------------------------------------------------------------------------- setAuthor
 	/**
 	 * @param Author $author
@@ -508,6 +530,15 @@ echo htmlentities($command) . "<br>";
 	public static function setAuthor($author)
 	{
 		Git_Config::$author = $author;
+	}
+
+	//-------------------------------------------------------------------------------- setProjectPath
+	/**
+	 * @param string $project_path
+	 */
+	public static function setProjectPath($project_path)
+	{
+		Git_Config::$project_path = $project_path;
 	}
 
 	//-------------------------------------------------------------------------------------- toString
@@ -807,23 +838,25 @@ class Main
 	{
 		switch ($params["command"]) {
 			case "commit":
-				return Git_Commands::commit($params["add_files"], $params["message"]);
+				return Git_Commands::commit($params["add_files"], $params["message"], $params["amend"]);
 			case "fetch":
 				return Git_Commands::fetch();
 			case "init":
 				return Git_Commands::init();
+			case "merge":
+				return Git_Commands::merge();
 			case "push":
 				return Git_Commands::push();
 		}
 	}
 
-	//------------------------------------------------------------------------------- guiAuthorChange
-	private static function guiAuthorChange()
+	//-------------------------------------------------------------------------------- guiAuthorInput
+	private static function guiAuthorInput()
 	{
 		$html = <<<EOT
 Author :
-<input id="author" value="$_SESSION[author]" SIZE="40" onkeydown="document.getElementById('change_button').style.display='inline'">
-<button onclick="location='phpgit?author='+document.getElementById('author').value" id='change_button' style="display:none;">change</button>
+<input id="author" value="$_SESSION[author]" SIZE="40" onkeydown="document.getElementById('author_change_button').style.display='inline'">
+<button onclick="location='phpgit?author='+document.getElementById('author').value" id='author_change_button' style="display:none;">change</button>
 EOT;
 		return $html;
 	}
@@ -858,24 +891,39 @@ EOT;
 	private static function guiMainActions()
 	{
 		$git_status = new Git_Status();
-		$author_change_html = Main::guiAuthorChange();
+		$author_change_html = Main::guiAuthorInput();
+		$project_path_change_html = Main::guiProjectPathInput();
 		$files_changes_html = Gui_Changed_Files_Selector::display($git_status->getFilesChanges());
 		$html = <<<EOT
+$project_path_change_html<br>
 $author_change_html
 <p>
 <button onclick="location='phpgit'">REFRESH<br>STATUS</button> &gt;
 <button onclick="location='phpgit?command=fetch'">\/<br>FETCH</button> &gt;
 <button onclick="location='phpgit?command=merge'">&lt;=&gt;<br>MERGE</button> &gt;
 <button onclick="if (document.commit.message.value) document.commit.submit(); else { alert('You must comment your commit'); document.commit.message.focus(); } ">--&gt;<br>COMMIT</button> &gt;
-<button onclick="location='phpgit?command=fetch'">/\<br>PUSH</button>
+<button onclick="location='phpgit?command=push'">/\<br>PUSH</button>
 <br>
 <form name="commit" action="phpgit" method="post">
 <input type="hidden" name="command" value="commit">
 <h3>Commit</h3>
 $files_changes_html
+<p>
+<input type="checkbox" name="amend" value="on">amend previous commit<br>
 <textarea name="message" cols="80" rows="3"></textarea>
 <script> document.commit.message.focus(); </script>
 </form>
+EOT;
+		return $html;
+	}
+
+	//--------------------------------------------------------------------------- guiProjectPathInput
+	private static function guiProjectPathInput()
+	{
+		$html = <<<EOT
+Project path :
+<input id="project_path" value="$_SESSION[project_path]" SIZE="40" onkeydown="document.getElementById('project_path_change_button').style.display='inline'">
+<button onclick="location='phpgit?project_path='+document.getElementById('project_path').value" id='project_path_change_button' style="display:none;">change</button>
 EOT;
 		return $html;
 	}
@@ -885,7 +933,11 @@ EOT;
 	{
 		Main::start($params);
 		if ($params["command"]) {
-			echo "<pre>" . htmlentities(join("\n", Main::callCommand($params))) . "</pre>";
+			echo "<h3>$params[command] result :</h3>"
+			. "<pre style='border: 1px solid black;margin:2px; padding:2px;'>"
+			. htmlentities(join("\n", Main::callCommand($params)))
+			. "</pre>"
+			. "<p>";
 		}
 		if (!Git::isInitialized()) {
 			echo Main::guiInitButton();
@@ -900,13 +952,24 @@ EOT;
 	{
 		ini_set("session.use_cookies", true);
 		session_start();
+		// author
 		if ($params["author"]) {
 			$_SESSION["author"] = $params["author"];
 		}
 		if (!$_SESSION["author"]) {
 			$_SESSION["author"] = "Your Name <your@email.org>";
 		}
-		Git_Config::setAuthor(new Author($_SESSION["author"]));
+		Git_Config::setAuthor(Author::createFromMimeString($_SESSION["author"]));
+		// project path
+		if ($params["project_path"]) {
+			$_SESSION["project_path"] = $params["project_path"];
+		}
+		if (!$_SESSION["project_path"]) {
+			$_SESSION["project_path"] = "./";
+		}
+		Git_Config::setProjectPath($_SESSION["project_path"]);
+		// apply git config
+		Git_Config::apply();
 	}
 
 }
