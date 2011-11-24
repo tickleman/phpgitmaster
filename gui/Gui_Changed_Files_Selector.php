@@ -11,23 +11,30 @@ class Gui_Changed_Files_Selector
 	 */
 	public static function display($files_changes)
 	{
-		$html = "";
 		$file_change = $files_changes->getFirstChange();
+		if ($file_change) $html = "<table>";
 		while (!is_null($file_change)) {
+			$html .= "<tr>";
 			$change_type = $file_change->getChangeType();
 			$type_text = $file_change->getChangeTypeAsText();
 			$file_name   = $file_change->getFileName();
 			if ($change_type === File_Change::READY) {
-				$checkbox =  "<input type=checkbox readonly checked onclick='return false'>\n";
+				$checkbox =  "<input type=checkbox readonly checked onclick='return false'>";
 				$change_type = "V";
 			} else {
-				$checkbox = "<input type=checkbox name='files[$file_name]' value='$change_type'>\n";
+				$checkbox = "<input type=checkbox name='files[$file_name]' value='$change_type'>";
 			}
-			$html .= "<span style='float:left;'>$checkbox</span>"
-			. "<span style='width:20px;float:left;' title='$type_text'>$change_type</span>"
-			. "$file_name<br>\n";
+			$html .= "<td>$checkbox</td>"
+			. "<td style='cursor:arrow;' title='$type_text'>$change_type</td>"
+			. "<td>$file_name</td>";
+			if ($change_type === File_Change::UNMERGED) {
+				$html .= "<td><button onclick=\"location='?command=prefer&file_name=$file_name&object_id=$previous_object_id'\">MY last commited version</button></td>"
+				. "<td><button onclick=\"location='?command=prefer&file_name=$file_name&object_id=$current_object_id'\">the last REMOTE version</button></td>";
+			}
+			$html .= "</tr>\n";
 			$file_change = $files_changes->getNextChange();
 		}
+		if ($html) $html .= "</table>";
 		return $html;
 	}
 

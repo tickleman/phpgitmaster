@@ -4,9 +4,10 @@ You've got :
 - a lot of git use PHP classes
 - links to common git commands
 - raw git checkout, status and log display on a web page
+- add, remove, commit GUI
 
 We need :
-- add, remove, commit GUI
+- for a standalone repository : link to a remote repository (git remote add origin (url) call)
+- merge
 - more gracefull display
 - git log detail / diffs
-
