@@ -6,19 +6,19 @@ include_once "git/Git_Ignore.php";
 class Git_Commands
 {
 
-	const GIT_ADD               = "git add '@file_name'";
+	const GIT_ADD               = "git add \"@file_name\"";
 	const GIT_CHECKOUT          = "git checkout";
-	const GIT_CLONE             = "git clone '@url' ./";
-	const GIT_COMMIT            = "git commit --author='@author' -m '@message'";
-	const GIT_COMMIT_AMEND      = "git commit --author='@author' -m '@message' --amend";
-	const GIT_CONFIG_USER_NAME  = "git config --global user.name '@name'";
-	const GIT_CONFIG_USER_EMAIL = "git config --global user.email '@email'";
+	const GIT_CLONE             = "git clone \"@url\" ./";
+	const GIT_COMMIT            = "git commit --author=\"@author\" -m \"@message\"";
+	const GIT_COMMIT_AMEND      = "git commit --author=\"@author\" -m \"@message\" --amend";
+	const GIT_CONFIG_USER_NAME  = "git config --global user.name \"@name\"";
+	const GIT_CONFIG_USER_EMAIL = "git config --global user.email \"@email\"";
 	const GIT_FETCH             = "git fetch";
 	const GIT_INIT              = "git init";
 	const GIT_LOG               = "git log --raw --date=iso";
 	const GIT_PUSH              = "git push -u origin master";
 	const GIT_MERGE             = "git merge origin/master --no-commit";
-	const GIT_REMOVE            = "git rm '@file_name'";
+	const GIT_REMOVE            = "git rm \"@file_name\"";
 	const GIT_STATUS            = "git status -s"; 
 
 	//------------------------------------------------------------------------------------------- add
@@ -75,10 +75,11 @@ class Git_Commands
 					break;
 			}
 		}
-		$message = str_replace("'", "\\'", $message);
+		$author  = str_replace('"', "\\\"", Git_Config::getAuthor()->toString());
+		$message = str_replace('"', "\\\"", $message);
 		$command = str_replace(
 			array("@author", "@message"),
-			array(Git_Config::getAuthor()->toString(), $message),
+			array($author, $message),
 			$amend ? Git_Commands::GIT_COMMIT_AMEND : Git_Commands::GIT_COMMIT 
 		);
 		$raw_output[] = "> " . $command;

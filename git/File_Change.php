@@ -62,6 +62,7 @@ class File_Change
 		$file_change->current_object_id  = null;
 		$file_change->change_type        = substr($raw_change, 0, 1);
 		$file_change->file_name          = substr($raw_change, 2);
+		$file_change->unquoteFileName();
 		return $file_change;
 	}
 
@@ -79,6 +80,7 @@ class File_Change
 		$file_change->current_object_id  = substr($raw_change, 26, 7);
 		$file_change->change_type        = substr($raw_change, 37, 1);
 		$file_change->file_name          = substr($raw_change, 39);
+		$file_change->unquoteFileName();
 		return $file_change;
 	}
 
@@ -96,6 +98,7 @@ class File_Change
 		$file_change->current_object_id  = null;
 		$file_change->change_type        = substr($raw_change, 1, 1);
 		$file_change->file_name          = substr($raw_change, 3);
+		$file_change->unquoteFileName();
 		return $file_change;
 	}
 
@@ -192,6 +195,17 @@ class File_Change
 			. $this->change_type . "  " . $this->file_name;
 		} else {
 			return $this->change_type . "\t" . $this->file_name;
+		}
+	}
+
+	//------------------------------------------------------------------------------- unquoteFileName
+	private function unquoteFileName()
+	{
+		if (
+			(substr($this->file_name, 0, 1) == '"')
+			&& (substr($this->file_name, -1) == '"')
+		) {
+			$this->file_name = substr($this->file_name, 1, -1);
 		}
 	}
 
