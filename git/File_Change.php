@@ -188,7 +188,7 @@ class File_Change
 		if ($this->current_object_id) {
 			return ":"
 			. $this->previous_branch . " " . $this->current_branch . " "
-			. $this->previous_file_crc . "... " . $this->current_file_crc . "... "
+			. $this->previous_object_id . "... " . $this->current_object_id . "... "
 			. $this->change_type . "  " . $this->file_name;
 		} else {
 			return $this->change_type . "\t" . $this->file_name;
