@@ -171,8 +171,8 @@ EOT;
 	 */
 	public static function mainCall($params)
 	{
-		echo "<html><head><title>PhpGitMaster by Tickleman</title></head><body>\n";
 		Main::start($params);
+		echo "<html><head><title>PhpGitMaster by Tickleman</title></head><body>\n";
 
 		if ($params["command"]) {
 			$command_result = Main::callCommand($params);
