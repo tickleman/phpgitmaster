@@ -133,8 +133,8 @@ $project_path_change_html<br>
 $author_change_html
 <p>
 <button onclick="location='./'">REFRESH<br>STATUS</button> &gt;
-<button onclick="location='?command=fetch'">\/<br>FETCH</button> &gt;
 <button onclick="if (document.commit.message.value) document.commit.submit(); else { alert('You must comment your commit'); document.commit.message.focus(); } ">--&gt;<br>COMMIT</button> &gt;
+<button onclick="location='?command=fetch'">\/<br>FETCH</button> &gt;
 <button onclick="location='?command=merge'">&lt;=&gt;<br>MERGE</button> &gt;
 <button onclick="location='?command=push'">/\<br>PUSH</button>
 <br>
