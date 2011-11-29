@@ -28,10 +28,22 @@ class Git_Commands
 	 */
 	public static function add($file_name)
 	{
-		$command = str_replace("@file_name", $file_name, Git_Commands::GIT_ADD);
-		$raw_output = array("> " . $command);
-		exec($command, $raw_output);
-		return $raw_output;
+		return Git_Commands::cmdCaller(str_replace("@file_name", $file_name, Git_Commands::GIT_ADD));
+	}
+
+	//------------------------------------------------------------------------------------- cmdCaller
+	private static function cmdCaller($command)
+	{
+		$result = array("> $command");
+		exec("$command 2>~giterr", $result);
+		clearstatcache();
+		if (is_file("~giterr")) {
+			foreach (file("~giterr") as $error) {
+				$result[] = "! " . $error;
+			}
+			unlink("~giterr");
+		}
+		return $result;
 	}
 
 	//-------------------------------------------------------------------------------------- cloneCmd
@@ -41,11 +53,10 @@ class Git_Commands
 	 */
 	public static function cloneCmd($url)
 	{
-		$command = str_replace("@url", $url, Git_Commands::GIT_CLONE);
-		$raw_output = array("> " . $command);
-		exec($command, $raw_output);
+		Git_Ignore::delete();
+		$result = Git_Commands::cmdCaller(str_replace("@url", $url, Git_Commands::GIT_CLONE));
 		Git_Ignore::createNew();
-		return $raw_output;
+		return $result;
 	}
 
 	//---------------------------------------------------------------------------------------- commit
@@ -82,9 +93,8 @@ class Git_Commands
 			array($author, $message),
 			$amend ? Git_Commands::GIT_COMMIT_AMEND : Git_Commands::GIT_COMMIT 
 		);
-		$raw_output[] = "> " . $command;
-		exec($command, $raw_output);
-		return $raw_output;
+		$result = Git_Commands::cmdCaller($command);
+		return array_merge($raw_output, $result);
 	}
 
 	//----------------------------------------------------------------------------------------- fetch
@@ -93,9 +103,7 @@ class Git_Commands
 	 */
 	public static function fetch()
 	{
-		$raw_output = array("> " . Git_Commands::GIT_FETCH);
-		exec(Git_Commands::GIT_FETCH, $raw_output);
-		return $raw_output;
+		return Git_Commands::cmdCaller(Git_Commands::GIT_FETCH);
 	}
 
 	//------------------------------------------------------------------------------------------ init
@@ -105,11 +113,11 @@ class Git_Commands
 	public static function init()
 	{
 		if (!is_dir(".git")) {
-			$raw_output = array("> " . Git_Commands::GIT_INIT);
-			exec(Git_Commands::GIT_INIT, $raw_output);
+			Git_Ignore::delete();
+			$result = Git_Commands::cmdCaller(Git_Commands::GIT_INIT);
 			Git_Ignore::createNew();
 			file_put_contents("README", "");
-			return $raw_output;
+			return $result;
 		} else {
 			return array("There is already a .git directory here");
 		}
@@ -121,9 +129,7 @@ class Git_Commands
 	 */
 	public static function merge()
 	{
-		$raw_output = array("> " . Git_Commands::GIT_MERGE);
-		exec(Git_Commands::GIT_MERGE, $raw_output);
-		return $raw_output;
+		return Git_Commands::cmdCaller(Git_Commands::GIT_MERGE);
 	}
 
 	//------------------------------------------------------------------------------------------ push
@@ -132,9 +138,7 @@ class Git_Commands
 	 */
 	public static function push()
 	{
-		$raw_output = array("> " . Git_Commands::GIT_PUSH);
-		exec(Git_Commands::GIT_PUSH, $raw_output);
-		return $raw_output;
+		return Git_Commands::cmdCaller(Git_Commands::GIT_PUSH);
 	}
 
 	//---------------------------------------------------------------------------------------- remove
@@ -144,10 +148,7 @@ class Git_Commands
 	 */
 	public static function remove($file_name)
 	{
-		$command = str_replace("@file_name", $file_name, Git_Commands::GIT_REMOVE);
-		$raw_output = array("> " . $command);
-		exec($command, $raw_output);
-		return $raw_output;
+		return Git_Commands::cmdCaller(str_replace("@file_name", $file_name, Git_Commands::GIT_REMOVE));
 	}
 
 }

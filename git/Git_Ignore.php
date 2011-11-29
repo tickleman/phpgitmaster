@@ -29,6 +29,12 @@ class Git_Ignore
 		return new Git_Ignore();
 	}
 
+	//---------------------------------------------------------------------------------------- delete
+	public static function delete()
+	{
+		@unlink(".gitignore");
+	}
+
 	//--------------------------------------------------------------------------------- isFileIgnored
 	/**
 	 * @param string $file_name
