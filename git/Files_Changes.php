@@ -23,7 +23,7 @@ class Files_Changes
 	public function add($file_change)
 	{
 		if ($file_change->isDirectory()) {
-			$this->addTree($file_change->getChangeType(), $file_change->getFileName());
+			$this->addTree($file_change->getFileName(), $file_change->getChangeType(), new Git_Ignore());
 		} else {
 			$this->files_changes[] = $file_change;
 		}
@@ -31,17 +31,22 @@ class Files_Changes
 
 	//--------------------------------------------------------------------------------------- addTree
 	/**
-	 * @param string $change_type
 	 * @param string $path
+	 * @param string $change_type
+	 * @param Git_Ignore $git_ignore
 	 */
-	private function addTree($change_type, $path)
+	private function addTree($path, $change_type, $git_ignore)
 	{
 		$d = dir($path);
 		while ($e = $d->read()) if (substr($e, 0, 1) != ".") {
-			if (is_dir("$path$e")) {
-				$this->addTree("$path$e/");
-			} else {
-				$this->add(new File_Change("$path$e", $change_type));
+			if (!$git_ignore->isFileIgnored("$path$e")) {
+				if (is_dir("$path$e")) {
+					if (!$git_ignore->isFileIgnored("$path$e/")) {
+						$this->addTree("$path$e/", $change_type);
+					}
+				} else {
+					$this->add(new File_Change("$path$e", $change_type));
+				}
 			}
 		}
 		$d->close();
