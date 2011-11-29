@@ -25,7 +25,7 @@ class Git_Ignore
 	 */
 	public static function createNew()
 	{
-		file_put_contents(".gitignore", ".git\n.settings\n.buildpath\n.gitignore\n.log\n.project\n");
+		file_put_contents(".gitignore", ".buildpath\n.git\n.log\n.project\n.settings\n");
 		return new Git_Ignore();
 	}
 
