@@ -23,7 +23,7 @@ class Files_Changes
 	public function add($file_change)
 	{
 		if ($file_change->isDirectory()) {
-			$this->addTree($file_change->getChangeType(), $file_change->getFileName());
+			$this->addTree($file_change->getFileName(), $file_change->getChangeType());
 		} else {
 			$this->files_changes[] = $file_change;
 		}
@@ -31,15 +31,15 @@ class Files_Changes
 
 	//--------------------------------------------------------------------------------------- addTree
 	/**
-	 * @param string $change_type
 	 * @param string $path
+	 * @param string $change_type
 	 */
-	private function addTree($change_type, $path)
+	private function addTree($path, $change_type)
 	{
 		$d = dir($path);
 		while ($e = $d->read()) if (substr($e, 0, 1) != ".") {
 			if (is_dir("$path$e")) {
-				$this->addTree("$path$e/");
+				$this->addTree("$path$e/", $change_type);
 			} else {
 				$this->add(new File_Change("$path$e", $change_type));
 			}
