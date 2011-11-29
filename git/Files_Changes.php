@@ -42,7 +42,7 @@ class Files_Changes
 			if (!$git_ignore->isFileIgnored("$path$e")) {
 				if (is_dir("$path$e")) {
 					if (!$git_ignore->isFileIgnored("$path$e/")) {
-						$this->addTree("$path$e/", $change_type);
+						$this->addTree("$path$e/", $change_type, $git_ignore);
 					}
 				} else {
 					$this->add(new File_Change("$path$e", $change_type));
