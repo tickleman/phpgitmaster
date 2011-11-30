@@ -34,14 +34,15 @@ class Git_Commands
 	//------------------------------------------------------------------------------------- cmdCaller
 	private static function cmdCaller($command)
 	{
+		$giterr = Git_Config::getTmpDir() . "/.~giterr";
 		$result = array("> $command");
-		exec("$command 2>~giterr", $result);
+		exec("$command 2>$giterr", $result);
 		clearstatcache();
-		if (is_file("~giterr")) {
-			foreach (file("~giterr") as $error) {
+		if (is_file($giterr)) {
+			foreach (file($giterr) as $error) {
 				$result[] = "! " . $error;
 			}
-			unlink("~giterr");
+			unlink($giterr);
 		}
 		return $result;
 	}

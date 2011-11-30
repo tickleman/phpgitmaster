@@ -81,6 +81,19 @@ class Files_Changes
 		return $next_change ? $next_change : null;
 	}
 
+	//--------------------------------------------------------------------------------------- toArray
+	/**
+	 * @return array
+	 */
+	public function toArray()
+	{
+		$array = array();
+		foreach ($this->files_changes as $file_change) {
+			$array[] = $file_change->toArray();
+		}
+		return $array;
+	}
+
 	//-------------------------------------------------------------------------------------- toString
 	/**
 	 * @return string

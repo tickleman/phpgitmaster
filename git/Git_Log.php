@@ -34,7 +34,7 @@ class Git_Log
 	}
 
 	//--------------------------------------------------------------------------------- getFirstEntry
-	/*
+	/**
 	 * @return Git_Log_Entry null if there is no entry
 	 */
 	public function getFirstEntry()
@@ -44,13 +44,26 @@ class Git_Log
 	}
 
 	//---------------------------------------------------------------------------------- getNextEntry
-	/*
+	/**
 	 * @return Git_Log_Entry null if last entry was reached
 	 */
 	public function getNextEntry()
 	{
 		$next_entry = next($this->log_entries);
 		return $next_entry ? $next_entry : null;
+	}
+
+	//--------------------------------------------------------------------------------------- toArray
+	/**
+	 * @return array
+	 */
+	public function toArray()
+	{
+		$array = array();
+		foreach ($this->log_entries as $log_entry) {
+			$array[] = $log_entry->toArray();
+		}
+		return $array;
 	}
 
 	//-------------------------------------------------------------------------------------- toString

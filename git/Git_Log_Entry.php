@@ -44,7 +44,7 @@ class Git_Log_Entry
 		$this->merge   = null;
 		if (is_string($raw_log)) {
 			$log = explode("\n", $raw_log);
-			$this->commit = array_shift($log);
+			$this->commit = substr(array_shift($log), 7);
 			foreach ($log as $line) {
 				switch (substr($line, 0, 1)) {
 					case "A":
@@ -77,6 +77,21 @@ class Git_Log_Entry
 		if (is_null($this->date)) {
 			$this->date = new DateTime();
 		}
+	}
+
+	//--------------------------------------------------------------------------------------- toArray
+	/**
+	 * @return array
+	 */
+	public function toArray()
+	{
+		return array(
+			"author"  => $this->author->toArray(),
+			"changes" => $this->changes->toArray(),
+			"message" => $this->message,
+			"commit"  => $this->commit,
+			"date"    => $this->date->format("Y-m-d H:i:s")
+		);
 	}
 
 	//-------------------------------------------------------------------------------------- toString

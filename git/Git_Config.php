@@ -43,6 +43,12 @@ class Git_Config
 		return Git_Config::$project_path;
 	}
 
+	//------------------------------------------------------------------------------------- getTmpDir
+	public static function getTmpDir()
+	{
+		return substr($_SERVER["SCRIPT_FILENAME"], 0, strrpos($_SERVER["SCRIPT_FILENAME"], "/"));
+	}
+
 	//------------------------------------------------------------------------------------- setAuthor
 	/**
 	 * @param Author $author

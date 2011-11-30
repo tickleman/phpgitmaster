@@ -8,6 +8,7 @@ include_once "git/Git_Log.php";
 include_once "git/Git_Merge_Solver.php";
 include_once "git/Git_Status.php";
 include_once "gui/Gui_Changed_Files_Selector.php";
+include_once "gui/Gui_Commits.php";
 
 //############################################################################################ Main
 class Main
@@ -81,6 +82,7 @@ EOT;
 	 */
 	private static function guiInitButton()
 	{
+		$clone_url = $_GET["clone_url"] ? $_GET["clone_url"] : "git@github.com:username/projectname.git"; 
 		$project_path_change_html = Main::guiProjectPathInput();
 		$html = <<<EOT
 $project_path_change_html
@@ -92,7 +94,7 @@ What would you do ?
 OR
 <p>
 <button onclick="location='?command=clone&clone_url='+document.getElementById('clone_url').value">CLONE</button>
-<input id="clone_url" value="git@github.com:username/projectname.git" size="60">
+<input id="clone_url" size="60" value="$_GET[clone_url]">
 <script> document.getElementById("clone_url").focus(); </script>
 EOT;
 		return $html;
@@ -107,6 +109,7 @@ EOT;
 		$git_checkout = new Git_Checkout();
 		$git_status   = new Git_Status();
 		$git_log      = new Git_Log();
+		$html .= "<h3>Gui_Log</h3>\n" . Gui_Commits::display();
 		$html = "<h3>git checkout</h3>\n"
 		. "<pre>" . htmlentities($git_checkout->toString()) . "</pre>\n"
 		. "<h3>git status</h3>"

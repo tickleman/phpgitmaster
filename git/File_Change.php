@@ -182,6 +182,17 @@ class File_Change
 		return (substr($this->file_name, -1) == "/");
 	}
 
+	//--------------------------------------------------------------------------------------- toArray
+	/**
+	 * @return toArray
+	 */
+	public function toArray()
+	{
+		$array = get_object_vars($this);
+		$array["change_type_text"] = $this->getChangeTypeAsText();
+		return $array;
+	}
+
 	//-------------------------------------------------------------------------------------- toString
 	/**
 	 * @return string

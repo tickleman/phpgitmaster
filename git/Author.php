@@ -58,6 +58,15 @@ class Author
 		return $this->name;
 	}
 
+	//--------------------------------------------------------------------------------------- toArray
+	/**
+	 * @return array
+	 */
+	public function toArray()
+	{
+		return get_object_vars($this);
+	}
+
 	//-------------------------------------------------------------------------------------- toString
 	/**
 	 * @return string
