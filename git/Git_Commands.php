@@ -17,7 +17,8 @@ class Git_Commands
 	const GIT_INIT              = "git init";
 	const GIT_LOG               = "git log --raw --date=iso";
 	const GIT_PUSH              = "git push -u origin master";
-	const GIT_MERGE             = "git merge origin/master --no-commit";
+	const GIT_MERGE             = "git merge origin/master --no-commit"; 
+	const GIT_REBASE            = "git rebase origin/master";
 	const GIT_REMOVE            = "git rm \"@file_name\"";
 	const GIT_STATUS            = "git status -s"; 
 
@@ -140,6 +141,15 @@ class Git_Commands
 	public static function push()
 	{
 		return Git_Commands::cmdCaller(Git_Commands::GIT_PUSH);
+	}
+
+	//---------------------------------------------------------------------------------------- rebase
+	/**
+	 * @return array
+	 */
+	public static function rebase()
+	{
+		return Git_Commands::cmdCaller(Git_Commands::GIT_REBASE);
 	}
 
 	//---------------------------------------------------------------------------------------- remove

@@ -9,7 +9,7 @@ class Gui_Commits
 	{
 		$log = new Git_Log();
 		$entries = $log->toArray(); 
-echo "<pre>" . print_r($entries, true) . "</pre>";
+		//echo "<pre>" . print_r($entries, true) . "</pre>";
 	}
 
 }
